@@ -22,3 +22,7 @@
 .context-level-view {
     margin: 1em;
 }
+
+#page-admin-tool-dataprivacy-exportfilter #id_coursecontextids {
+    min-height: 350px;
+}

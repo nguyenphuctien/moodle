@@ -61,12 +61,6 @@ if (!$manage && $profilenode = $PAGE->settingsnav->find('myprofile', null)) {
 $title = get_string('createnewdatarequest', 'tool_dataprivacy');
 $PAGE->navbar->add($title);
 
-// If contactdataprotectionofficer is disabled, send the user back to the profile page, or the privacy policy page.
-// That is, unless you have sufficient capabilities to perform this on behalf of a user.
-if (!$manage && !\tool_dataprivacy\api::can_contact_dpo()) {
-    redirect($returnurl, get_string('contactdpoviaprivacypolicy', 'tool_dataprivacy'), 0, \core\output\notification::NOTIFY_ERROR);
-}
-
 $mform = new tool_dataprivacy_data_request_form($url->out(false), ['manage' => !empty($manage),
     'persistent' => new \tool_dataprivacy\data_request(0, (object) ['type' => $requesttype])]);
 

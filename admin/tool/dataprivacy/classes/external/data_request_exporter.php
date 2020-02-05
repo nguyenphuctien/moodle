@@ -160,6 +160,7 @@ class data_request_exporter extends persistent_exporter {
 
         switch ($this->persistent->get('status')) {
             case api::DATAREQUEST_STATUS_PENDING:
+            case api::DATAREQUEST_STATUS_PREPROCESSING:
                 $values['statuslabelclass'] = 'badge-info';
                 // Request can be manually completed for general enquiry requests.
                 $values['canmarkcomplete'] = $requesttype == api::DATAREQUEST_TYPE_OTHERS;

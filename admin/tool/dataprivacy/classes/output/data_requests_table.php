@@ -248,8 +248,18 @@ class data_requests_table extends table_sql {
                 }
                 // Approve.
                 $actiondata['data-action'] = 'approve';
-                $actiontext = get_string('approverequest', 'tool_dataprivacy');
-                $actions[] = new action_menu_link_secondary($actionurl, null, $actiontext, $actiondata);
+
+                if (get_config('tool_dataprivacy', 'allowfiltering') && $data->type == api::DATAREQUEST_TYPE_EXPORT) {
+                    $actiontext = get_string('approverequestall', 'tool_dataprivacy');
+                    $actions[] = new action_menu_link_secondary($actionurl, null, $actiontext, $actiondata);
+
+                    $actionfilterurl = new moodle_url('exportfilter.php', ['requestid' => $requestid]);
+                    $actiontext = get_string('filterexportdata', 'tool_dataprivacy');
+                    $actions[] = new \action_menu_link_secondary($actionfilterurl, null, $actiontext);
+                } else {
+                    $actiontext = get_string('approverequest', 'tool_dataprivacy');
+                    $actions[] = new action_menu_link_secondary($actionurl, null, $actiontext, $actiondata);
+                }
 
                 // Deny.
                 $actiondata['data-action'] = 'deny';
