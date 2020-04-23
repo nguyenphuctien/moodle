@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,16 +15,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Defines the version of workshop
- *
- * @package    mod_workshop
- * @copyright  2009 David Mudrak <david.mudrak@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2020112004;        // The current module version (YYYYMMDDXX)
-$plugin->requires  = 2019111200;        // Requires this Moodle version.
-$plugin->component = 'mod_workshop';
+/**
+ * Definition of workshop scheduled tasks.
+ *
+ * @package   mod_workshop
+ * @copyright 2020 Tien.NguyenPhuc <nguyenphuctien@gmail.com>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+$messageproviders = array (
+    // Notification when phase changed.
+    'phasechanged' => array(
+
+    ),
+);

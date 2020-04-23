@@ -39,12 +39,14 @@ class mod_workshop_mod_form extends moodleform_mod {
 
     /** @var object the course this instance is part of */
     protected $course = null;
+    protected static $notificationgroups = array();
 
     /**
      * Constructor
      */
     public function __construct($current, $section, $cm, $course) {
         $this->course = $course;
+        self::$notificationgroups = ['customemail', 'contributingstudent', 'tutor', 'websiteupdater', 'workspaceupdater'];
         parent::__construct($current, $section, $cm, $course);
     }
 
@@ -248,6 +250,21 @@ class mod_workshop_mod_form extends moodleform_mod {
         $label = get_string('assessmentend', 'workshop');
         $mform->addElement('date_time_selector', 'assessmentend', $label, array('optional' => true));
 
+        // Phase-change notifications.
+        $mform->addElement('header', 'phasechangenotification', get_string('phasechangenotification', 'workshop'));
+        $mform->addHelpButton('phasechangenotification', 'phasechangenotification', 'workshop');
+
+        $this->add_phase_change_notification_options_group($mform, 'setup', get_string('setup', 'workshop'));
+        $this->add_phase_change_notification_options_group($mform, 'submission', get_string('submission', 'workshop'));
+        $this->add_phase_change_notification_options_group($mform, 'assessment', get_string('assessment', 'workshop'));
+        $this->add_phase_change_notification_options_group($mform, 'evaluation', get_string('evaluation', 'workshop'));
+        $this->add_phase_change_notification_options_group($mform, 'closed', get_string('phaseclosed', 'workshop'));
+
+        $mform->addElement('text', 'customemail', get_string('customemail', 'workshop'), ['size' => 64]);
+        $mform->setType('customemail', PARAM_TEXT);
+        $mform->addRule('customemail', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+        $mform->addHelpButton('customemail', 'customemail', 'workshop');
+
         $coursecontext = context_course::instance($this->course->id);
         // To be removed (deprecated) with MDL-67526.
         plagiarism_get_form_elements_module($mform, $coursecontext, 'mod_workshop');
@@ -323,6 +340,9 @@ class mod_workshop_mod_form extends moodleform_mod {
             file_prepare_draft_area($draftitemid, null, 'mod_workshop', 'conclusion', 0);    // no context yet, itemid not used
             $data['conclusioneditor'] = array('text' => '', 'format' => editors_get_preferred_format(), 'itemid' => $draftitemid);
         }
+
+        // Prepare data for phase notification settings.
+        $this->preprocessing_notification_settings($data);
     }
 
     /**
@@ -468,5 +488,44 @@ class mod_workshop_mod_form extends moodleform_mod {
         }
 
         return $errors;
+    }
+
+    /**
+     * Create options group for phase change notification
+     *
+     * @param object $mform the form
+     * @param string $phasename phase's name
+     * @param string $phasetext phase's translated name
+     * @return void
+     * @throws coding_exception
+     */
+    protected function add_phase_change_notification_options_group($mform, $phasename, $phasetext) {
+        $optionGroups = array();
+        $options = workshop::get_all_notification_options();
+
+        foreach ($options as $key => $option) {
+            $field = 'notifyto' . $phasename . $key;
+            $optionGroups[] = $mform->createElement('checkbox', $field, $option);
+        }
+
+        $mform->addGroup($optionGroups, 'notifyto' . $phasename, $phasetext, null, false);
+    }
+
+    /**
+     * Create options group for phase change notification
+     *
+     * @param object $mform the form
+     * @param string $phasename phase's name
+     * @return void
+     * @throws dml_exception
+     */
+    protected function preprocessing_notification_settings(&$data) {
+        global $DB;
+
+        $notificationoptions = $DB->get_records('workshop_notifications', ['workshopid' => $data['id']]);
+        foreach ($notificationoptions as $option) {
+            $fieldname = 'notifyto' . $option->phase . $option->roleid;
+            $data[$fieldname] = $option->value;
+        }
     }
 }

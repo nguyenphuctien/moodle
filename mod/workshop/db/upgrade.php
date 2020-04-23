@@ -92,5 +92,40 @@ function xmldb_workshop_upgrade($oldversion) {
     // Automatically generated Moodle v3.8.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2020112003) {
+
+        // Define field customemail to be added to workshop.
+        $table = new xmldb_table('workshop');
+        $field = new xmldb_field('customemail', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'overallfeedbackmaxbytes');
+
+        // Conditionally launch add field customemail.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define table workshop_notifications to be created.
+        $table = new xmldb_table('workshop_notifications');
+
+        // Adding fields to table workshop_notifications.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('workshopid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('phase', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('roleid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('value', XMLDB_TYPE_INTEGER, '1', null, null, null, '0');
+
+        // Adding keys to table workshop_notifications.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('workshop_fk', XMLDB_KEY_FOREIGN, ['workshopid'], 'workshop', ['id']);
+        $table->add_key('role_pk', XMLDB_KEY_FOREIGN, ['roleid'], 'role', ['id']);
+
+        // Conditionally launch create table for workshop_notifications.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Workshop savepoint reached.
+        upgrade_mod_savepoint(true, 2020112003, 'workshop');
+    }
+
     return true;
 }

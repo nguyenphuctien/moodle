@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/workshop/db" VERSION="20180626" COMMENT="XMLDB file for Moodle mod/workshop"
+<XMLDB PATH="mod/workshop/db" VERSION="20200320" COMMENT="XMLDB file for Moodle mod/workshop"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -43,6 +43,7 @@
         <FIELD NAME="overallfeedbackfiles" TYPE="int" LENGTH="3" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Number of allowed attachments to the overall feedback."/>
         <FIELD NAME="overallfeedbackfiletypes" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="comma separated list of file extensions"/>
         <FIELD NAME="overallfeedbackmaxbytes" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="100000" SEQUENCE="false" COMMENT="Maximum size of one file attached to the overall feedback."/>
+        <FIELD NAME="customemail" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Assessment notification flag to check if notification schedule is executed."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -132,6 +133,20 @@
         <KEY NAME="workshop_fk" TYPE="foreign" FIELDS="workshopid" REFTABLE="workshop" REFFIELDS="id"/>
         <KEY NAME="user_fk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
         <KEY NAME="workshopuser" TYPE="unique" FIELDS="workshopid, userid" COMMENT="The combination of workshopid with userid must be unique in this table"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="workshop_notifications" COMMENT="This table keeps information about the notification settings">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="workshopid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the workshop"/>
+        <FIELD NAME="phase" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Phase of the notification"/>
+        <FIELD NAME="roleid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of role who get the notification"/>
+        <FIELD NAME="value" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The value of setting"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="workshop_fk" TYPE="foreign" FIELDS="workshopid" REFTABLE="workshop" REFFIELDS="id" COMMENT="Workshop foreign key"/>
+        <KEY NAME="role_pk" TYPE="foreign" FIELDS="roleid" REFTABLE="role" REFFIELDS="id" COMMENT="Role foreign key"/>
       </KEYS>
     </TABLE>
   </TABLES>
