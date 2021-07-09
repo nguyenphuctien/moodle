@@ -175,12 +175,6 @@ M.mod_quiz.nav.init = function(Y) {
             // Automatically submit the form. We do it this strange way because just
             // calling form.submit() does not run the form's submit event handlers.
             var submit = form.one('input[name="next"]');
-
-            // Navigation when button enable.
-            if (submit.get('disabled')) {
-                return;
-            }
-
             submit.set('name', '');
             submit.getDOMNode().click();
         };
@@ -215,6 +209,25 @@ M.mod_quiz.nav.init = function(Y) {
             nav_to_page(-1);
         }, 'a.endtestlink');
     }
+
+    // Navigation buttons should be disabled when the files are uploading.
+    require(['core_form/events'], function(formEvent) {
+        document.addEventListener(formEvent.eventTypes.uploadStarted, function() {
+            var quizNavigationBlock = document.getElementById('mod_quiz_navblock');
+            if (quizNavigationBlock) {
+                quizNavigationBlock.classList.add('nav-disabled');
+            }
+        });
+
+        document.addEventListener(formEvent.eventTypes.uploadCompleted, function() {
+            if (formEvent.uploadCompleted()) {
+                var quizNavigationBlock = document.getElementById('mod_quiz_navblock');
+                if (quizNavigationBlock) {
+                    quizNavigationBlock.classList.remove('nav-disabled');
+                }
+            }
+        });
+    });
 
     if (M.core_question_flags) {
         M.core_question_flags.add_listener(M.mod_quiz.nav.update_flag_state);
